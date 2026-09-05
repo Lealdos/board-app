@@ -1,0 +1,297 @@
+/*
+ * The printed elevator board. Plain CSS on purpose: this is a letter-sized
+ * print artifact measured in millimetres, and it must render identically here,
+ * in the exported standalone HTML file, and in the hidden measuring sheet used
+ * by the layout pass. Tailwind is only used for the editor chrome around it.
+ *
+ * --board-scale multiplies every type size (and the two fixed column widths
+ * that depend on type size) so the layout pass can grow or shrink the board to
+ * fill the page.
+ */
+
+.board {
+    --board-scale: 1;
+
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    color: #1e293b;
+    font-size: 10pt;
+    line-height: 1.2;
+    /* keep the dark banner and colored badges when printing */
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+}
+
+/* On-screen preview of the printed letter sheet.
+   Flex column so the content block can stretch to the page bottom. */
+.board .sheet {
+    box-sizing: border-box;
+    width: 216mm;
+    height: 279mm;
+    padding: 10mm 12mm;
+    background-color: #f8fafc;
+    display: flex;
+    flex-direction: column;
+}
+
+.board .sheet * {
+    box-sizing: border-box;
+}
+
+.board .sheet + .sheet {
+    margin-top: 16px;
+}
+
+/* Top Header Banner */
+.board .header {
+    flex: 0 0 auto;
+    background-color: #5d7ecd;
+    color: #ffffff;
+    padding: 10px 18px;
+    border-bottom: 4px solid #2563eb;
+    border-radius: 4px 4px 0 0;
+    margin-bottom: 8px;
+    text-align: center;
+}
+
+.board .header h1 {
+    margin: 0;
+    font-size: 20pt;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: #ffffff;
+}
+
+.board .header .subtitle {
+    margin-top: 3px;
+    font-size: 11pt;
+    color: #fefeff;
+    font-weight: 500;
+}
+
+.board .header .location-tag {
+    margin-top: 2px;
+    font-size: 12pt;
+    font-weight: 700;
+    color: #fafcfd;
+    letter-spacing: 0.5px;
+}
+
+/* Layout grid — stretches to fill the remaining sheet height */
+.board .grid {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    gap: 8px;
+}
+
+/* Each column is a flex column so its card fills the leftover space */
+.board .grid-col {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    flex: 1 1 50%;
+}
+
+/* Section Cards */
+.board .card {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    background-color: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 6px 9px;
+    break-inside: avoid;
+    page-break-inside: avoid;
+}
+
+.board .card-header {
+    flex: 0 0 auto;
+    font-size: 11pt;
+    font-weight: 700;
+    padding-bottom: 4px;
+    margin-bottom: 4px;
+    border-bottom: 2px solid;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    color: #1e40af;
+    border-color: #3b82f6;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px;
+}
+
+.board .card-header .range {
+    font-size: 8.5pt;
+    font-weight: 700;
+    color: #64748b;
+    letter-spacing: 0.2px;
+}
+
+/* Holds the group bands and their tables; this is the space the layout pass
+   measures against. */
+.board .card-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Tables inside Cards */
+/* rows sit indented under their group band so the hierarchy reads */
+.board .event-table {
+    width: calc(100% - 7px);
+    margin-left: 7px;
+    border-collapse: collapse;
+    table-layout: fixed;
+    /* Each table grows in proportion to its row count (flex-grow is set per
+       table), so every row on the sheet ends up the same height. */
+    flex-basis: 0;
+    flex-shrink: 1;
+    min-height: 0;
+}
+
+.board .event-table tr {
+    /* equal shares of the stretched table: one baseline grid per column */
+    height: calc(100% / var(--rows, 1));
+    border-bottom: 1px solid #f1f5f9;
+    break-inside: avoid;
+    page-break-inside: avoid;
+}
+
+.board .event-table tr:last-child {
+    border-bottom: none;
+}
+
+.board .event-table td {
+    padding: 2.5px 2px;
+    vertical-align: middle;
+}
+
+/* Time and room columns are sized in absolute units so they always fit their
+   longest string ("06:00 AM - 04:00 PM", "PRIVATE DINING ROOM"); the title
+   column takes whatever is left. */
+.board .time-col {
+    width: calc(36mm * var(--board-scale));
+    font-weight: 700;
+    color: #334155;
+    font-size: calc(10pt * var(--board-scale));
+    white-space: nowrap;
+    padding-right: 6px;
+    /* last-resort guard: clip rather than overlap the title */
+    overflow: hidden;
+}
+
+.board .title-col {
+    color: #0f172a;
+    font-weight: 600;
+    font-size: calc(10.2pt * var(--board-scale));
+    overflow-wrap: break-word;
+    padding-right: 5px;
+}
+
+.board .room-col {
+    width: calc(24mm * var(--board-scale));
+    text-align: right;
+}
+
+.board .room-badge {
+    /* full-width block: every badge shares one left/right edge */
+    display: block;
+    background-color: #f1f5f9;
+    color: #475569;
+    border: 1px solid #cbd5e1;
+    padding: 1px 4px;
+    border-radius: 3px;
+    font-weight: 700;
+    font-size: calc(8.1pt * var(--board-scale));
+    line-height: 1.15;
+    /* long room names wrap instead of widening the column */
+    overflow-wrap: break-word;
+    text-align: center;
+}
+
+/* Keeps a shorter column on the same row grid as the busier one: it takes the
+   space the missing rows would have used instead of stretching the rows. */
+.board .row-filler {
+    flex-basis: 0;
+    flex-shrink: 1;
+    min-height: 0;
+}
+
+/* Group (client / meeting host) sub-headings.
+   Solid band so a guest scanning from across the lobby finds their group name
+   first, then reads the rows underneath it. */
+.board .sub-heading {
+    flex: 0 0 auto;
+    background-color: #1e40af;
+    color: #ffffff;
+    font-weight: 800;
+    font-size: calc(9.75pt * var(--board-scale));
+    padding: 3px 7px;
+    margin: 6px 0 2px 0;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    break-after: avoid;
+    page-break-after: avoid;
+    overflow-wrap: break-word;
+}
+
+/* first group heading sits flush under the card header */
+.board .card-body > .sub-heading:first-child {
+    margin-top: 0;
+}
+
+/* marks a group that continues from the previous column, so the band doesn't
+   read as a second, separate group */
+.board .sub-heading .cont {
+    font-weight: 600;
+    letter-spacing: 0.2px;
+    opacity: 0.85;
+}
+
+/* Off-screen sheet used to measure natural row heights before laying out. */
+.board-measure {
+    position: absolute;
+    top: 0;
+    left: -20000px;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.board-measure .card-body {
+    display: block;
+}
+
+.board-measure .event-table {
+    flex-basis: auto;
+}
+
+.board-measure .event-table tr {
+    height: auto;
+}
+
+@page {
+    size: letter portrait;
+    margin: 10mm 12mm;
+}
+
+@media print {
+    .board .sheet {
+        /* letter height (279mm) minus the @page top/bottom margins (10mm each) */
+        width: auto;
+        height: 259mm;
+        padding: 0;
+        background: none;
+        overflow: hidden;
+    }
+
+    .board .sheet + .sheet {
+        margin-top: 0;
+        break-before: page;
+        page-break-before: always;
+    }
+}
