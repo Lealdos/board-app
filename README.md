@@ -31,7 +31,7 @@ printing behave the same in every browser.
 | --- | --- |
 | `src/lib/pdf-text.ts` | pdf.js text extraction, worker bundled with the app |
 | `src/lib/rbl-parser.ts` | positioned text → `BoardModel`; no DOM, unit tested |
-| `src/lib/board-html.ts` | the board markup, shared by preview, measuring and export |
+| `src/lib/board-html.ts` | the board markup, shared by preview, measuring and printing |
 | `src/lib/board-layout.ts` | column split, one shared row height, font auto-fit |
 | `src/board/board.css` | the printed sheet (plain CSS, millimetres) |
 | `src/components/*` | editor UI (React + shadcn/ui) |

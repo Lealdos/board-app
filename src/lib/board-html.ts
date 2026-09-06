@@ -122,3 +122,7 @@ export function sheetHtml(model: BoardModel, left: ColumnItem[], right: ColumnIt
 export function boardHtml(model: BoardModel, layout: BoardLayout): string {
   return layout.sheets.map((sheet) => sheetHtml(model, sheet.left, sheet.right)).join('')
 }
+
+export function boardTitle(model: BoardModel): string {
+  return model.dateText ? `Daily Event Schedule - ${model.dateText}` : 'Daily Event Schedule'
+}

@@ -16,9 +16,7 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Toaster } from '@/components/ui/sonner';
 import { useBoardLayout } from '@/hooks/use-board-layout';
-import { visibleEvents } from '@/lib/board-html';
-import { boardTitle } from '@/lib/export-html';
-import { extractPdfText } from '@/lib/pdf-text';
+import { boardTitle, visibleEvents } from '@/lib/board-html';
 import { buildModel } from '@/lib/rbl-parser';
 import { loadModel, saveModel } from '@/lib/storage';
 import type { BoardModel } from '@/lib/types';
@@ -55,6 +53,8 @@ export default function App() {
         setBusy(true);
         setError(null);
         try {
+            // Loaded on demand so pdf.js stays out of the initial bundle.
+            const { extractPdfText } = await import('@/lib/pdf-text');
             const pages = await extractPdfText(await file.arrayBuffer());
             const parsed = buildModel(pages, file.name);
             if (parsed.events.length === 0) {
