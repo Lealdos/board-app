@@ -19,6 +19,7 @@ export function DropZone({ onFile, busy = false, className }: DropZoneProps) {
   }
 
   return (
+    // biome-ignore lint/a11y/noStaticElementInteractions: drag-and-drop is a pointer-only affordance; the "Choose PDF" button and file input cover keyboard users.
     <div
       onDragOver={(event) => {
         event.preventDefault()

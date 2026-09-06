@@ -1,4 +1,5 @@
-import { ArrowDown, ArrowUp } from 'lucide-react'
+import { ArrowDown, ArrowUp, Trash2 } from 'lucide-react'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
@@ -38,6 +39,43 @@ export function EventEditor({ model, onChange }: EventEditorProps) {
     })
   }
 
+  const groupName = (groupId: string) =>
+    model.groups.find((group) => group.id === groupId)?.name || 'Ungrouped events'
+
+  /** Takes a whole section off the board without losing it: the rows stay here. */
+  const setGroupHidden = (groupId: string, hidden: boolean) => {
+    onChange({
+      ...model,
+      events: model.events.map((event) =>
+        event.groupId === groupId ? { ...event, hidden } : event,
+      ),
+    })
+  }
+
+  /** Drops a section and its rows for good; the toast is the only way back. */
+  const removeGroup = (groupId: string) => {
+    const previous = model
+    const removed = model.events.filter((event) => event.groupId === groupId).length
+    onChange({
+      ...model,
+      groups: model.groups.filter((group) => group.id !== groupId),
+      events: model.events.filter((event) => event.groupId !== groupId),
+    })
+    toast.success(`Removed ${groupName(groupId)}`, {
+      description: removed === 1 ? '1 event' : `${removed} events`,
+      action: { label: 'Undo', onClick: () => onChange(previous) },
+    })
+  }
+
+  /** How much of each section is on the board, for the section checkbox. */
+  const groupTotals = new Map<string, { total: number; shown: number }>()
+  for (const event of model.events) {
+    const total = groupTotals.get(event.groupId) ?? { total: 0, shown: 0 }
+    total.total += 1
+    if (!event.hidden) total.shown += 1
+    groupTotals.set(event.groupId, total)
+  }
+
   const rows: React.ReactNode[] = []
   let lastGroupId: string | null = null
 
@@ -45,15 +83,37 @@ export function EventEditor({ model, onChange }: EventEditorProps) {
     if (event.groupId !== lastGroupId) {
       lastGroupId = event.groupId
       const group = model.groups.find((candidate) => candidate.id === event.groupId)
+      const totals = groupTotals.get(event.groupId) ?? { total: 0, shown: 0 }
+      const name = groupName(event.groupId)
       rows.push(
         <TableRow key={`group-${event.groupId || index}`} className="bg-muted/60 hover:bg-muted/60">
-          <TableCell colSpan={6} className="py-2">
+          <TableCell className="w-10 py-2">
+            <Checkbox
+              checked={totals.shown === totals.total}
+              indeterminate={totals.shown > 0 && totals.shown < totals.total}
+              aria-label={`Show ${name} on board`}
+              onCheckedChange={(checked) => setGroupHidden(event.groupId, !checked)}
+            />
+          </TableCell>
+          <TableCell colSpan={4} className="py-2">
             <Input
               value={group?.name ?? ''}
               placeholder="No group heading"
               onChange={(e) => renameGroup(event.groupId, e.target.value)}
               className="h-8 border-transparent bg-transparent font-semibold uppercase tracking-wide shadow-none focus-visible:border-input focus-visible:bg-background"
             />
+          </TableCell>
+          <TableCell className="w-20 py-2">
+            <Button
+              size="icon"
+              variant="ghost"
+              className="size-7 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+              aria-label={`Remove ${name}`}
+              title={`Remove ${name} and its ${totals.total === 1 ? 'event' : 'events'}`}
+              onClick={() => removeGroup(event.groupId)}
+            >
+              <Trash2 className="size-3.5" />
+            </Button>
           </TableCell>
         </TableRow>,
       )

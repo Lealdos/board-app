@@ -21,6 +21,7 @@ export function BoardPreview({ model, layout, measureRef }: BoardPreviewProps) {
       {model && layout ? (
         <div
           className="board-sheets"
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: boardHtml() builds the sheet from parsed PDF data and escapes every interpolation via escapeHtml().
           dangerouslySetInnerHTML={{ __html: boardHtml(model, layout) }}
         />
       ) : null}
