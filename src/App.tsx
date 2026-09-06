@@ -131,7 +131,6 @@ export default function App() {
                                 orientation='vertical'
                                 className='mx-1 h-6'
                             />
-
                             <Button
                                 size='sm'
                                 onClick={() => window.print()}
