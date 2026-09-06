@@ -5,7 +5,7 @@ import {
     useRef,
     useState,
 } from 'react';
-import { AlertTriangle, Download, Printer, RotateCcw } from 'lucide-react';
+import { AlertTriangle, Printer, RotateCcw } from 'lucide-react';
 import { toast } from 'sonner';
 import { BoardPreview } from '@/components/board-preview';
 import { DropZone } from '@/components/drop-zone';
@@ -17,12 +17,7 @@ import { Separator } from '@/components/ui/separator';
 import { Toaster } from '@/components/ui/sonner';
 import { useBoardLayout } from '@/hooks/use-board-layout';
 import { visibleEvents } from '@/lib/board-html';
-import {
-    boardFileName,
-    boardTitle,
-    downloadFile,
-    exportStandaloneHtml,
-} from '@/lib/export-html';
+import { boardTitle } from '@/lib/export-html';
 import { extractPdfText } from '@/lib/pdf-text';
 import { buildModel } from '@/lib/rbl-parser';
 import { loadModel, saveModel } from '@/lib/storage';
@@ -83,12 +78,6 @@ export default function App() {
             setBusy(false);
         }
     }, []);
-
-    const handleExport = () => {
-        if (!model || !layout) return;
-        downloadFile(boardFileName(model), exportStandaloneHtml(model, layout));
-        toast.success(`Saved ${boardFileName(model)}`);
-    };
 
     const shownCount = model ? visibleEvents(model).length : 0;
     const hiddenCount = model ? model.events.length - shownCount : 0;
