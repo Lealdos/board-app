@@ -14,6 +14,7 @@ bun install
 bun run dev      # http://localhost:5173
 bun test         # parser tests against the sample reports
 bun run build    # static site in dist/
+bun run lint     # biome (bun run lint:fix applies the safe fixes)
 ```
 
 ## Deploying
@@ -34,6 +35,15 @@ printing behave the same in every browser.
 | `src/lib/board-layout.ts` | column split, one shared row height, font auto-fit |
 | `src/board/board.css` | the printed sheet (plain CSS, millimetres) |
 | `src/components/*` | editor UI (React + shadcn/ui) |
+
+### Curating the board
+
+Rows are toggled off the printed board with the `On` checkbox and stay in the
+editor. The same checkbox on a section heading applies to the whole group — it
+shows a dash while only part of the section is on the board — and hiding every
+row in a group also drops its heading band from the sheet. The trash button on
+the heading removes the section and its events outright; the toast that follows
+carries the only undo.
 
 ### Reading the report
 

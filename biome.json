@@ -1,0 +1,60 @@
+{
+	"$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+	"vcs": {
+		"enabled": true,
+		"clientKind": "git",
+		"useIgnoreFile": true
+	},
+	"files": {
+		"ignoreUnknown": true,
+		"includes": ["**", "!public"]
+	},
+	"css": {
+		"parser": {
+			"tailwindDirectives": true
+		}
+	},
+	"formatter": {
+		"enabled": false
+	},
+	"linter": {
+		"enabled": true,
+		"domains": {
+			"react": "recommended"
+		},
+		"rules": {
+			"preset": "recommended",
+			"correctness": {
+				"useHookAtTopLevel": "error",
+				"useExhaustiveDependencies": {
+					"level": "error",
+					"options": { "reportUnnecessaryDependencies": false }
+				}
+			},
+			"style": {
+				"useComponentExportOnlyModules": {
+					"level": "warn",
+					"options": { "allowConstantExport": true }
+				}
+			}
+		}
+	},
+	"overrides": [
+		{
+			"includes": ["**/*.css"],
+			"linter": {
+				"rules": {
+					"complexity": { "noImportantStyles": "off" }
+				}
+			}
+		},
+		{
+			"includes": ["src/components/ui/**"],
+			"linter": {
+				"rules": {
+					"a11y": { "noLabelWithoutControl": "off" }
+				}
+			}
+		}
+	]
+}
