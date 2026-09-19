@@ -1,7 +1,7 @@
 /*
  * The printed elevator board. Plain CSS on purpose: this is a letter-sized
  * print artifact measured in millimetres, and it must render identically here,
- * in the exported standalone HTML file, and in the hidden measuring sheet used
+ * in the PDF that goes out by email, and in the hidden measuring sheet used
  * by the layout pass. Tailwind is only used for the editor chrome around it.
  *
  * --board-scale multiplies every type size (and the two fixed column widths
@@ -251,6 +251,29 @@
     font-weight: 600;
     letter-spacing: 0.2px;
     opacity: 0.85;
+}
+
+/* Off-screen copy of the board, rasterised into the emailed PDF. Unlike
+   .board-measure it has to stay visible: html2canvas skips hidden subtrees. */
+.board-capture {
+    position: fixed;
+    top: 0;
+    left: -20000px;
+    z-index: -1;
+    pointer-events: none;
+}
+
+/* The capture follows the printed sheet, not the on-screen one: the preview's
+   slate page and rounded corners would come out as a full-bleed grey page in
+   the PDF, and whoever receives it prints it. */
+.board.board-capture .sheet {
+    background-color: #ffffff;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.board.board-capture .sheet + .sheet {
+    margin-top: 0;
 }
 
 /* Off-screen sheet used to measure natural row heights before laying out. */

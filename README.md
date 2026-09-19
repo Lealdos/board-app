@@ -2,7 +2,7 @@
 
 Turns the daily RBL report (the PDF from the event system) into the printable
 lobby board, in the browser. Drop the PDF in, fix anything that needs fixing,
-print it.
+print it or send it out by email.
 
 Everything runs client-side: the PDF is read in the browser and never uploaded,
 so guest and client data stays on the machine that opened the page.
@@ -33,6 +33,8 @@ printing behave the same in every browser.
 | `src/lib/rbl-parser.ts` | positioned text → `BoardModel`; no DOM, unit tested |
 | `src/lib/board-html.ts` | the board markup, shared by preview, measuring and printing |
 | `src/lib/board-layout.ts` | column split, one shared row height, font auto-fit |
+| `src/lib/board-pdf.ts` | the same markup rasterised into a letter PDF (loaded on demand) |
+| `src/lib/mail.ts` | the mailto: draft: recipients, subject, body |
 | `src/board/board.css` | the printed sheet (plain CSS, millimetres) |
 | `src/components/*` | editor UI (React + shadcn/ui) |
 
@@ -44,6 +46,31 @@ shows a dash while only part of the section is on the board — and hiding every
 row in a group also drops its heading band from the sheet. The trash button on
 the heading removes the section and its events outright; the toast that follows
 carries the only undo.
+
+### Emailing the board
+
+`Email board` builds the PDF in the browser — the same `board-html.ts` markup and
+`board.css` the preview and the printout use, captured sheet by sheet — and then
+hands it to whatever mail client the machine already has. There is still no
+server in the loop.
+
+How it gets attached depends on the browser, and neither route carries
+everything. Where `navigator.canShare()` takes files (Safari, Chrome on most
+platforms), `Share as attachment` passes the PDF straight to the system share
+sheet and it lands in the draft — but the sheet drops the addresses, so they go
+to the clipboard on the way past, ready to paste. `Download & open email` is the
+mirror image: `mailto:` fills in recipients, subject and body but cannot carry a
+file, so the PDF is saved and the last drag is manual. Recipients are remembered
+in localStorage next to the board draft.
+
+The captured sheet follows the *printed* board, not the on-screen preview: the
+preview's slate page and rounded corners would reach the recipient as a
+full-bleed grey page, and a lobby board exists to be printed.
+
+The PDF is a 192dpi image of each sheet rather than PDF text. That keeps
+`board-layout.ts` the only thing that decides where a row goes, at the cost of
+selectable text; `CAPTURE_SCALE` and `JPEG_QUALITY` at the top of `board-pdf.ts`
+are the two knobs if the attachment comes out too heavy.
 
 ### Reading the report
 

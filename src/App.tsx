@@ -5,10 +5,11 @@ import {
     useRef,
     useState,
 } from 'react';
-import { AlertTriangle, Printer, RotateCcw } from 'lucide-react';
+import { AlertTriangle, Mail, Printer, RotateCcw } from 'lucide-react';
 import { toast } from 'sonner';
 import { BoardPreview } from '@/components/board-preview';
 import { DropZone } from '@/components/drop-zone';
+import { SendEmailDialog } from '@/components/send-email-dialog';
 import { EventEditor } from '@/components/event-editor';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
@@ -29,6 +30,7 @@ export default function App() {
     const [model, setModel] = useState<BoardModel | null>(() => loadModel());
     const [busy, setBusy] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [emailOpen, setEmailOpen] = useState(false);
     const { measureRef, layout } = useBoardLayout(model);
 
     const paneRef = useRef<HTMLDivElement>(null);
@@ -85,6 +87,14 @@ export default function App() {
     return (
         <div className='min-h-screen bg-muted/30'>
             <Toaster position='top-center' />
+            {model && layout ? (
+                <SendEmailDialog
+                    model={model}
+                    layout={layout}
+                    open={emailOpen}
+                    onOpenChange={setEmailOpen}
+                />
+            ) : null}
 
             <header className='app-chrome sticky top-0 z-10 border-b bg-background/95 backdrop-blur'>
                 <div className='mx-auto flex max-w-[1800px] items-center gap-4 px-6 py-3'>
@@ -127,6 +137,15 @@ export default function App() {
                             >
                                 <Printer className='size-4' />
                                 Print / Save PDF
+                            </Button>
+                            <Button
+                                variant='outline'
+                                size='sm'
+                                onClick={() => setEmailOpen(true)}
+                                disabled={!layout}
+                            >
+                                <Mail className='size-4' />
+                                Email board
                             </Button>
                             <Button
                                 variant='ghost'

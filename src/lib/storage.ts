@@ -23,3 +23,30 @@ export function loadModel(): BoardModel | null {
     return null
   }
 }
+
+const MAIL_KEY = 'elevator-board:mail:v1'
+
+export interface MailPrefs {
+  to: string
+  cc: string
+}
+
+/** Who the board went to last time; the subject and body come from the board. */
+export function saveMailPrefs(prefs: MailPrefs): void {
+  try {
+    localStorage.setItem(MAIL_KEY, JSON.stringify(prefs))
+  } catch {
+    // Same bargain as the draft: a forgotten address list is not worth a crash.
+  }
+}
+
+export function loadMailPrefs(): MailPrefs {
+  try {
+    const raw = localStorage.getItem(MAIL_KEY)
+    if (!raw) return { to: '', cc: '' }
+    const parsed = JSON.parse(raw) as Partial<MailPrefs>
+    return { to: parsed.to ?? '', cc: parsed.cc ?? '' }
+  } catch {
+    return { to: '', cc: '' }
+  }
+}

@@ -11,7 +11,7 @@ interface BoardPreviewProps {
 /**
  * The printable board. It is written as HTML rather than JSX so that the exact
  * same markup builder feeds the preview, the hidden measuring pass and the
- * exported standalone file — the print layout can't drift between them.
+ * PDF that goes out by email — the print layout can't drift between them.
  */
 export function BoardPreview({ model, layout, measureRef }: BoardPreviewProps) {
   return (

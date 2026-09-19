@@ -152,6 +152,7 @@
 /* Print only the board: the editor, header and preview scaling all drop out. */
 @media print {
     .app-chrome,
+    .board-capture,
     [data-sonner-toaster] {
         display: none !important;
     }
