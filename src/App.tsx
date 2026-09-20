@@ -5,7 +5,7 @@ import {
     useRef,
     useState,
 } from 'react';
-import { AlertTriangle, Mail, Printer, RotateCcw } from 'lucide-react';
+import { AlertTriangle, Mail, RotateCcw } from 'lucide-react';
 import { toast } from 'sonner';
 import { BoardPreview } from '@/components/board-preview';
 import { DropZone } from '@/components/drop-zone';
@@ -130,22 +130,21 @@ export default function App() {
                                 orientation='vertical'
                                 className='mx-1 h-6'
                             />
-                            <Button
+                            {/* <Button
                                 size='sm'
                                 onClick={() => window.print()}
                                 disabled={!layout}
                             >
                                 <Printer className='size-4' />
                                 Print / Save PDF
-                            </Button>
+                            </Button> */}
                             <Button
-                                variant='outline'
-                                size='sm'
+                                size='lg'
                                 onClick={() => setEmailOpen(true)}
                                 disabled={!layout}
                             >
                                 <Mail className='size-4' />
-                                Email board
+                                Share/Save board
                             </Button>
                             <Button
                                 variant='ghost'
