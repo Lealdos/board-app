@@ -113,7 +113,6 @@ export function SendEmailDialog({
         return () => controller.abort();
     }, [open, model, layout, attempt]);
 
-    const draft = { to, cc, subject, body: message };
     const canShare =
         file !== null &&
         typeof navigator !== 'undefined' &&
