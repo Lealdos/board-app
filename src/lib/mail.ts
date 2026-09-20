@@ -33,8 +33,9 @@ export function defaultBody(model: BoardModel, sheets: number): string {
   const sheetText = sheets === 1 ? '1 sheet' : `${sheets} sheets`
   const eventText = events === 1 ? '1 event' : `${events} events`
   const where = model.property ? ` for ${model.property}` : ''
+  const date = model.dateText ? ` for ${model.dateText}` : ''
   return [
-    `Attached is the lobby board${where}${model.dateText ? ` for ${model.dateText}` : ''}.`,
+    `Attached is the lobby board${where}${date}.`,
     `${eventText} on ${sheetText}.`,
   ].join('\r\n')
 }
@@ -57,7 +58,7 @@ export function mailtoUrl(draft: MailDraft): string {
   // history of showing a `%40` it was handed verbatim in the To field.
   const addresses = (value: string) =>
     parseRecipients(value)
-      .map((address) => encodeURIComponent(address).replace(/%40/g, '@'))
+      .map((address) => encodeURIComponent(address).replaceAll('%40', '@'))
       .join(',')
 
   const params: string[] = []
@@ -65,7 +66,7 @@ export function mailtoUrl(draft: MailDraft): string {
   if (cc) params.push(`cc=${cc}`)
   if (draft.subject) params.push(`subject=${encodeURIComponent(draft.subject)}`)
 
-  const head = `mailto:${addresses(draft.to)}${params.length ? `?${params.join('&')}` : ''}`
+  const head = 'mailto:' + addresses(draft.to) + (params.length ? '?' + params.join('&') : '')
   if (!draft.body) return head
 
   // Trim the body itself rather than the finished URL: cutting the string
