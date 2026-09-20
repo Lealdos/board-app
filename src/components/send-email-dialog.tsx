@@ -21,13 +21,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { boardFileName, downloadBlob, formatBytes } from '@/lib/board-file';
-import {
-    defaultBody,
-    defaultSubject,
-    mailtoUrl,
-    parseRecipients,
-    withAttachmentNote,
-} from '@/lib/mail';
+import { defaultBody, defaultSubject, parseRecipients } from '@/lib/mail';
 import { loadMailPrefs, saveMailPrefs } from '@/lib/storage';
 import type { BoardLayout, BoardModel } from '@/lib/types';
 
