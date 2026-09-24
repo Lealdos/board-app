@@ -1,10 +1,25 @@
 import * as pdfjs from 'pdfjs-dist'
-import type { TextItem } from 'pdfjs-dist/types/src/display/api'
+import type { PDFPageProxy, TextContent, TextItem } from 'pdfjs-dist/types/src/display/api'
 import PdfWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?worker'
 import type { PdfPageText, PdfTextItem } from './types'
 
 // Bundled worker, so the app stays self-contained on any static host.
 pdfjs.GlobalWorkerOptions.workerPort = new PdfWorker()
+
+/**
+ * `page.getTextContent()` drains its stream with `for await`, and Safari's
+ * ReadableStream is not async-iterable ("undefined is not a function"), so the
+ * stream is read chunk by chunk instead.
+ */
+async function readTextItems(page: PDFPageProxy): Promise<TextContent['items']> {
+  const reader = page.streamTextContent().getReader()
+  const items: TextContent['items'] = []
+  for (;;) {
+    const { done, value } = await reader.read()
+    if (done) return items
+    items.push(...(value as TextContent).items)
+  }
+}
 
 /**
  * Reads every text run of a PDF with its position, in top-left origin points.
@@ -22,9 +37,8 @@ export async function extractPdfText(data: ArrayBuffer): Promise<PdfPageText[]> 
     for (let pageNumber = 1; pageNumber <= doc.numPages; pageNumber += 1) {
       const page = await doc.getPage(pageNumber)
       const viewport = page.getViewport({ scale: 1 })
-      const content = await page.getTextContent()
       const items: PdfTextItem[] = []
-      for (const raw of content.items) {
+      for (const raw of await readTextItems(page)) {
         const item = raw as TextItem
         if (!item.str) continue
         items.push({
